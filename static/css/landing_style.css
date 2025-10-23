@@ -1,0 +1,95 @@
+/* --- Basic Setup --- */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* Prevents scrollbars from the layout */
+}
+
+/* --- Main Blue Container --- */
+.main-container {
+    width: 100%;
+    height: 100vh;
+    background-color: #b1d9f3; 
+    position: relative;
+    padding-top: 60px; /* Offset for the fixed navbar */
+    box-sizing: border-box;
+}
+
+/* --- Top Black Navbar --- */
+.navbar {
+    width: 90%;
+    height: 90px;
+    border-radius: 20px;
+    background-color: #a0beff;
+    color: #000000;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    box-sizing: border-box;
+
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);  /* centers it horizontally */
+    z-index: 10;
+}
+
+
+.navbar .site-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* --- Centered Content Area --- */
+.content-area {
+    width: 100%;
+    height: calc(100vh - 90px); /* Full height minus navbar */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding-bottom: 100px; /* Space for bottom annotation */
+    box-sizing: border-box;
+}
+
+.button-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  gap: 50px; /* space between buttons */
+  justify-items: center; /* center each button */
+  align-items: center;
+  margin-top: 30px;
+}
+
+/* --- Survey Buttons --- */
+.survey-btn {
+  background: #a0beff;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  height: 60px;
+  width: 220px;
+  color: #000;
+  display: flex;             /* enables flexbox centering */
+  justify-content: center;   /* centers text horizontally */
+  align-items: center;       /* centers text vertically */
+  padding: 12px 30px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.survey-btn:hover {
+  background: #7da6ff;
+}
+
+@media (max-width: 600px) {
+  .button-wrapper {
+    grid-template-columns: 1fr;
+  }
+}

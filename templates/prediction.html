@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Model</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="logo">
+            <a href="/">StudentSurvey</a>
+        </div>
+        <ul>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li class="active"><a href="/prediction">Prediction</a></li>
+            <li><a href="#">About</a></li>
+        </ul>
+        <div class="nav-extra">
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <main class="main-content">
+
+        <section class="prediction-section card-style">
+            <h2>🔮 Expenditure Prediction Model</h2>
+            <p>Fill in the details to predict a student's likely expenditure.</p>
+            
+            <form id="prediction-form">
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" value="21" required>
+                </div>
+                <div class="form-group">
+                    <label for="study-hours">Daily Study Hours:</label>
+                    <input type="number" id="study-hours" name="study-hours" value="3" required>
+                </div>
+                <div class="form-group">
+                    <label for="income">Income (₹):</label>
+                    <select id="income" name="income">
+                        <option value="< 5000">&lt; ₹5,000</option>
+                        <option value="5000 - 10000">₹5,000 - ₹10,000</option>
+                        <option value="10000 - 20000" selected>₹10,000 - ₹20,000</option>
+                        <option value="20000 - 30000">₹20,000 - ₹30,000</option>
+                        <option value="> 30000">&gt; ₹30,000</option>
+                    </select>
+                </div>
+                <button type="submit">Predict</button>
+            </form>
+            
+            <div id="prediction-result-container">
+                <h3>Prediction:</h3>
+                <span id="prediction-result">...</span>
+            </div>
+        </section>
+
+    </main>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

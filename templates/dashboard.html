@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="site-name">SITE NAME</div>
+        <a href="/" class="home-link">HOME</a>
+    </nav>
+
+    <div class="main-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-item circular selected">
+                SB
+            </div>
+            
+            <div class="sidebar-item rectangular">
+                Chart 1
+            </div>
+            <div class="sidebar-item rectangular">
+                Chart 2
+            </div>
+            <div class="sidebar-item rectangular">
+                Chart 3
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="viz-grid">
+                <div class="viz-tile"></div>
+                <div class="viz-tile"></div>
+                <div class="viz-tile"></div>
+                <div class="viz-tile"></div>
+            </div>
+        </main>
+
+    </div>
+
+</body>
+</html>
