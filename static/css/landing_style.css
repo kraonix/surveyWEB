@@ -11,13 +11,13 @@ body, html {
 .main-container {
     width: 100%;
     height: 100vh;
-    background-color: #b1d9f3; 
+    background-color: #395465; 
     position: relative;
     padding-top: 60px; /* Offset for the fixed navbar */
     box-sizing: border-box;
 }
 
-/* --- Top Black Navbar --- */
+/* --- Top Navbar --- */
 .navbar {
     width: 90%;
     height: 90px;
