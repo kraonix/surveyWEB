@@ -1,0 +1,30 @@
+<div class="viz-tile dynamic-tile">
+    <h2>{{ title }}</h2>
+
+    <div style="width:100%; height:430px; position:relative;">
+        <canvas id="boxCanvas"></canvas>
+    </div>
+
+    <script>
+        var ctx = document.getElementById("boxCanvas");
+
+        new Chart(ctx, {
+            type: "boxplot",
+            data: {
+                labels: {{ labels | tojson }},
+                datasets: {{ datasets | tojson }}
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: "white" } }
+                },
+                scales: {
+                    x: { ticks: { color: "white" } },
+                    y: { ticks: { color: "white" } }
+                }
+            }
+        });
+    </script>
+</div>

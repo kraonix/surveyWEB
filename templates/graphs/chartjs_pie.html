@@ -1,0 +1,61 @@
+<div class="viz-tile dynamic-tile">
+    <h2>{{ title }}</h2>
+
+    <div style="width:100%; height:400px; position:relative;">
+        <canvas id="chartCanvas">
+        </canvas>
+    </div>
+
+    <script>
+        // Destroy old chart if exists
+        if (window.currentChart) {
+            try { window.currentChart.destroy(); } catch(e) {}
+            window.currentChart = null;
+        }
+
+        // USE var (safe even if re-run)
+        var canvasEl = document.getElementById('chartCanvas');
+
+        // Create new chart
+        window.currentChart = new Chart(canvasEl, {
+            type: 'pie',
+            data: {
+                labels: {{ labels | tojson }},
+                datasets: [{
+                    data: {{ values | tojson }},
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                    ],
+                    borderColor: "white",
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        align: "end",
+                        labels: {
+                            color: "white",
+                            font: {
+                            size: 14,
+                            weight: "bold"
+                        },
+                        padding: 20
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        bottom: 20,
+                        right: 20
+                    }
+                }
+            }
+        });
+    </script>
+</div>

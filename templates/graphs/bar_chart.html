@@ -1,0 +1,48 @@
+<div class="viz-tile dynamic-tile">
+    <h2>{{ title }}</h2>
+
+    <div style="width:100%; height:420px; position:relative;">
+        <canvas id="barChart"></canvas>
+    </div>
+
+    <script>
+        if (window.currentChart) {
+            window.currentChart.destroy();
+        }
+
+        var ctx = document.getElementById("barChart");
+
+        window.currentChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: {{ labels | tojson }},
+                datasets: [{
+                    label: "{{ y_label }}",
+                    data: {{ values | tojson }},
+                    backgroundColor: "rgba(54, 162, 235, 0.7)",
+                    borderColor: "white",
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: "white" }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: "white" }
+                    },
+                    y: {
+                        ticks: { color: "white" },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</div>

@@ -1,0 +1,39 @@
+<div class="viz-tile dynamic-tile">
+    <h2>{{ title }}</h2>
+
+    <div id="heatmapDiv" style="width:100%; height:450px;"></div>
+
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <script>
+        var data = [{
+            z: {{ z | tojson }},
+            x: {{ x | tojson }},
+            y: {{ y | tojson }},
+            type: "heatmap",
+            colorscale: "Viridis",
+            showscale: true
+        }];
+
+        var layout = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: "white" },
+
+            xaxis: {
+                title: "Monthly Income (₹ Ranges)",
+                tickangle: -45
+            },
+            yaxis: {
+                title: "Income Source"
+            },
+
+            margin: { t: 40, l: 120, r: 40, b: 120 }
+        };
+
+        Plotly.newPlot("heatmapDiv", data, layout, {
+            displayModeBar: false,   
+            displaylogo: false
+        });
+    </script>
+</div>

@@ -1,0 +1,41 @@
+<div class="prediction-box">
+    <h2>Income Predictor</h2>
+
+    <label>Age:</label>
+    <input id="age" type="number">
+
+    <label>Daily Study Hours:</label>
+    <input id="study" type="number">
+
+    <label>Academic Year:</label>
+    <select id="year">
+        <option>1st Year</option>
+        <option>2nd Year</option>
+        <option>3rd Year</option>
+        <option>4th Year</option>
+    </select>
+
+    <button onclick="predictIncome()">Predict</button>
+
+    <p id="predicted_output"></p>
+</div>
+
+<script>
+async function predictIncome() {
+    const payload = {
+        age: Number(document.getElementById("age").value),
+        study_hours: Number(document.getElementById("study").value),
+        academic_year: document.getElementById("year").value
+    }
+
+    const res = await fetch("/predict/income", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    document.getElementById("predicted_output").innerText =
+        "Predicted Income: ₹" + data.predicted_income;
+}
+</script>

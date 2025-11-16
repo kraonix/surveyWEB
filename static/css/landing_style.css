@@ -1,95 +1,192 @@
-/* --- Basic Setup --- */
-body, html {
+/* ------------------ Global Reset ------------------ */
+* {
     margin: 0;
     padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-    overflow: hidden; /* Prevents scrollbars from the layout */
-}
-
-/* --- Main Blue Container --- */
-.main-container {
-    width: 100%;
-    height: 100vh;
-    background-color: #395465; 
-    position: relative;
-    padding-top: 60px; /* Offset for the fixed navbar */
     box-sizing: border-box;
+    font-family: "Inter", sans-serif;
 }
 
-/* --- Top Navbar --- */
+body, html {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+}
+
+
+/* ------------------ Abstract Gradient Background ------------------ */
+.main-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at 20% 20%, #4c50ff, transparent 60%),
+                radial-gradient(circle at 80% 80%, #39d2c0, transparent 60%),
+                linear-gradient(135deg, #1f2337, #12141e);
+    position: relative;
+    padding-top: 100px;
+}
+
+
+/* ------------------ Glassmorphic Navbar ------------------ */
 .navbar {
     width: 90%;
-    height: 90px;
-    border-radius: 20px;
-    background-color: #a0beff;
-    color: #000000;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    height: 65px;
+    position: fixed;
+    top: 20px;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 18px;
+    color: #ffffff;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 40px;
-    box-sizing: border-box;
+    z-index: 50;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
 
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);  /* centers it horizontally */
-    z-index: 10;
+.site-name {
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.navbar .nav-links {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.participate-link:hover {
+    color: #a5c9ff;
+}
+
+.participate-link {
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.participate-link:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.28);
+    transform: translateY(-2px);
 }
 
 
-.navbar .site-name {
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-/* --- Centered Content Area --- */
+/* ----------- Main content area centered grid ----------- */
 .content-area {
     width: 100%;
-    height: calc(100vh - 90px); /* Full height minus navbar */
+    flex: 1;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: relative;
-    padding-bottom: 100px; /* Space for bottom annotation */
-    box-sizing: border-box;
 }
 
+/* Grid container */
 .button-wrapper {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columns */
-  gap: 50px; /* space between buttons */
-  justify-items: center; /* center each button */
-  align-items: center;
-  margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(2, 250px);
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
 }
 
-/* --- Survey Buttons --- */
+/* ----------- Glass buttons ----------- */
 .survey-btn {
-  background: #a0beff;
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  height: 60px;
-  width: 220px;
-  color: #000;
-  display: flex;             /* enables flexbox centering */
-  justify-content: center;   /* centers text horizontally */
-  align-items: center;       /* centers text vertically */
-  padding: 12px 30px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 600;
-  text-align: center;
-  transition: 0.3s;
+    text-decoration: none;
+    text-align: center;
+    padding: 18px 20px;
+    font-size: 1.1rem;
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    transition: 0.25s ease;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .survey-btn:hover {
-  background: #7da6ff;
+    transform: translateY(-6px);
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.28);
 }
 
-@media (max-width: 600px) {
-  .button-wrapper {
-    grid-template-columns: 1fr;
-  }
+.blob {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle at 30% 30%, #6a7bff, #4b00e0);
+    filter: blur(90px);
+    opacity: 0.45;
+    animation: float 12s infinite ease-in-out alternate;
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.blob1 {
+    top: 15%;
+    left: 10%;
+}
+
+.blob2 {
+    bottom: 10%;
+    right: 15%;
+    background: radial-gradient(circle at 30% 30%, #00ffd0, #008cff);
+    animation-duration: 16s;
+}
+
+.blob3 {
+    top: 50%;
+    right: 40%;
+    background: radial-gradient(circle at 30% 30%, #ff6ad5, #ff2b89);
+    animation-duration: 20s;
+}
+
+@keyframes float {
+    from { transform: translateY(0px) translateX(0px); }
+    to { transform: translateY(-40px) translateX(30px); }
+}
+
+.footer {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 25px 0;
+    margin-top: 60px;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    width: 100%;
+}
+
+
+/* Smaller screens */
+@media (max-width: 650px) {
+    .content-area {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar {
+        width: 95%;
+        padding: 0 20px;
+    }
 }

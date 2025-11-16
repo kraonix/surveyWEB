@@ -1,43 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
+
 <body>
 
+    <!-- Navbar -->
     <nav class="navbar">
-        <div class="site-name">SURVEY WORLD</div>
+        <div class="site-name">Student Expenses</div>
         <a href="/" class="home-link">HOME</a>
     </nav>
 
+    <!-- Background Blobs -->
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+
     <div class="main-container">
 
+        <!-- Sidebar -->
         <aside class="sidebar">
-            
-            <div class="sidebar-item rectangular">
-                Chart 1
+
+            <div class="sidebar-item" data-target="predictions">
+                Predictions
             </div>
-            <div class="sidebar-item rectangular">
-                Chart 2
+
+            <div class="sidebar-item" data-target="data_overview">
+                Gender Distribution
             </div>
-            <div class="sidebar-item rectangular">
-                Chart 3
+
+            <div class="sidebar-item" data-target="academic_hours">
+                Academic Hours per Week vs Daily Study Hours
             </div>
+
+            <div class="sidebar-item" data-target="food_vs_eating">
+                Expenditure on Food vs Frequency of Eating Out
+            </div>
+
+            <div class="sidebar-item" data-target="wlb_vs_academic_load">
+                Work-Life Balance Rating vs Academic Load (Hours/week)
+            </div>
+
+            <div class="sidebar-item" data-target="screen_time">
+                Screen Time vs Work-Life Balance
+            </div>
+
+            <div class="sidebar-item" data-target="monthly_rent">
+                Monthly Rent vs Type of Accommodation
+            </div>
+
+            <div class="sidebar-item" data-target="income_vs_monthly">
+                Income Source vs Monthly Income Amount
+            </div>
+
+            <div class="sidebar-item" data-target="academic_year_exp">
+                Academic Year vs Monthly Expenditure
+            </div>
+
+            <div class="sidebar-item" data-target="part_time_vs_wlb">
+                Participation in Part-time Work vs Work-Life Balance Rating
+            </div>
+
         </aside>
 
-        <main class="main-content">
-            <div class="viz-grid">
-                <div class="viz-tile"></div>
-                <div class="viz-tile"></div>
-                <div class="viz-tile"></div>
-                <div class="viz-tile"></div>
-            </div>
-        </main>
 
-    </div>
+            <!-- MAIN RIGHT AREA -->
+            <main class="main-content">
+                <div id="chart-container">
+                    <div class="viz-tile placeholder">
+                        <h2>Select a chart from the sidebar</h2>
+                    </div>
+                </div>
+            </main> 
+        </div>
+    <div id="toast" class="toast"></div>
 
 </body>
+
 </html>
