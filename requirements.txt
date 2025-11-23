@@ -3,3 +3,15 @@ pandas
 plotly
 scikit-learn
 numpy
+gunicorn
+plotly.express
+plotly.io
+config
+joblib
+sklearn.ensemble
+sklearn.model_selection
+sklearn.metrics
+sklearn.preprocessing
+sklearn.pipeline
+os
+sklearn.compose
