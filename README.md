@@ -12,10 +12,10 @@ A full-stack open-source project that analyzes student lifestyle, academics, and
 - Auto-loading visualizations
 
 ### 🔹 **2. Machine Learning Prediction Models**
-Includes 4 ML models:
+Includes 3 ML models:
 - **Income Predictor**
 - **Expenditure Forecast**
-- **Lifestyle Balance Model** *(coming soon)*
+- **Lifestyle Balance Model**
 - **Study Pattern Model** *(coming soon)*
 
 All models trained using student survey data with preprocessing, encoding & error handling.
@@ -24,9 +24,10 @@ All models trained using student survey data with preprocessing, encoding & erro
 - `/models` → ML model training scripts  
 - `/services` → Model loading & prediction logic  
 - `/templates` → HTML templates  
-- `/static/js` → UI logic & interactive components  
-- `/static/css` → Styling  
+- `/static` → UI logic (JS) & Styling (CSS)
+- `/utils` → Data loading & preprocessing utilities
 - `app.py` → Main Flask server  
+- `config.py` → Application configuration
 
 ---
 
@@ -59,8 +60,19 @@ All models trained using student survey data with preprocessing, encoding & erro
 
 ## 📂 Project Structure
 
-<img width="287" height="764" alt="image" src="https://github.com/user-attachments/assets/10072fc0-0597-4abd-b3fc-61bdd6f9c775" />
-
+```
+surveyWEB/
+├── app.py                  # Main application entry point
+├── config.py               # Configuration settings
+├── requirements.txt        # Project dependencies
+├── student_survey_data.csv # Data source
+├── models/                 # Trained ML models
+├── services/               # Prediction logic services
+├── static/                 # Static assets (CSS, JS)
+├── templates/              # HTML templates
+├── tests/                  # Unit tests
+└── utils/                  # Utility functions (data loading)
+```
 
 ---
 
@@ -71,10 +83,20 @@ All models trained using student survey data with preprocessing, encoding & erro
 git clone https://github.com/yourusername/surveyWEB.git
 cd surveyWEB
 ```
-<img width="661" height="320" alt="image" src="https://github.com/user-attachments/assets/ec65588c-70cf-45c9-a909-261d97b7b49b" />
-<img width="662" height="244" alt="image" src="https://github.com/user-attachments/assets/f06c23c6-fed9-4a97-8791-1b62c34fb4c3" />
-<img width="658" height="464" alt="image" src="https://github.com/user-attachments/assets/8a155fa8-24a6-4196-9e4c-81fe09c5d109" />
-<img width="660" height="262" alt="image" src="https://github.com/user-attachments/assets/e1d93e67-c2e1-46aa-a26b-16c444aa0471" />
+
+### **2️⃣ Install Dependencies**
+Ensure you have Python installed. Then run:
+```bash
+pip install -r requirements.txt
+```
+
+### **3️⃣ Run the Application**
+```bash
+python app.py
+```
+The application will start on `http://127.0.0.1:5000/`.
+
+---
 
 ## 🎯 How to Use
 
@@ -84,7 +106,8 @@ cd surveyWEB
 - Graphs load using **AJAX + Chart.js + Plotly**  
 
 ### **Prediction Models**
-- Go to **Predictions → Income / Expenditure**  
+- Go to **Predictions** section
+- Choose a model (Income, Expenditure, Lifestyle)
 - Enter required values  
 - Live prediction appears instantly  
 - Model accuracy score is shown below the output  
@@ -117,4 +140,3 @@ Thanks to the contributors and students whose survey responses power the analyti
 ---
 
 ## ⭐ Star the repo if you like it!
-
