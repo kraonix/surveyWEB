@@ -1,0 +1,80 @@
+<div class="viz-tile dynamic-tile">
+    <h2>{{ title }}</h2>
+
+    <div style="width:100%; height:100%; position:relative; min-height: 450px;">
+        <canvas id="boxPlotChart"></canvas>
+    </div>
+
+    <!-- Chart.js Boxplot Plugin loaded in dashboard.html -->
+
+    <script>
+        // Ensure the plugin is registered
+        // In UMD build, it should be available as window.ChartBoxPlot or similar, 
+        // but often it auto-registers with the global Chart object.
+        
+        if (window.currentChart) {
+            window.currentChart.destroy();
+        }
+
+        var ctx = document.getElementById("boxPlotChart").getContext("2d");
+        var rawData = {{ plot_data | tojson }};
+        
+        // Transform data for Chart.js BoxPlot
+        var labels = rawData.map(d => d.label);
+        var dataValues = rawData.map(d => d.values);
+
+        window.currentChart = new Chart(ctx, {
+            type: "boxplot",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Monthly Rent",
+                    data: dataValues,
+                    backgroundColor: "rgba(54, 162, 235, 0.5)",
+                    borderColor: "white",
+                    borderWidth: 2,
+                    outlierColor: '#ff6b6b',
+                    padding: 10,
+                    itemRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                // Custom tooltip to show stats
+                                var v = context.parsed;
+                                if (v) {
+                                     return `Min: ${v.min}, Q1: ${v.q1}, Median: ${v.median}, Q3: ${v.q3}, Max: ${v.max}`;
+                                }
+                                return "";
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: "white" },
+                        grid: { display: false }
+                    },
+                    y: {
+                        ticks: { color: "white" },
+                        grid: { color: "rgba(255,255,255,0.1)" },
+                        title: {
+                            display: true,
+                            text: 'Monthly Rent (₹)',
+                            color: 'white'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</div>

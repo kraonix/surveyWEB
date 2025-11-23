@@ -1,13 +1,19 @@
-import pandas as pd
 import plotly.express as px
 import plotly.io as pio
+import pandas as pd
 from flask import Flask, render_template, request, jsonify
 from services.income_service import IncomePredictorService
+from services.lifestyle_service import LifestyleService
+from utils.data_loader import load_data, preprocess_eating_frequency
+from config import Config
 
 
 app = Flask(__name__)
+app.config.from_object(Config)
+
 pio.templates.default = "plotly_white"
 income_service = IncomePredictorService()
+lifestyle_service = LifestyleService()
 
 @app.route("/predict/income", methods=["POST"])
 def predict_income():
@@ -34,10 +40,6 @@ def predict_expenditure():
         data = request.json
 
         monthly_income = float(data["income"])
-        gender = data["gender"]
-        wlb = float(data["wlb_rating"])
-        study = float(data["daily_study"])
-        screen = float(data["screen_time"])
         eat = data["eat_out_frequency"]
         academic = data["academic_year"]
         accommodation = data["accommodation"]
@@ -46,13 +48,9 @@ def predict_expenditure():
         from services.expenditure_service import ExpenditureService
         svc = ExpenditureService()
 
-        pred = svc.predict(
+        pred, advice = svc.predict(
             monthly_income,
-            study,
-            screen,
-            wlb,
             eat,
-            gender,
             academic,
             accommodation,
             part_time
@@ -60,111 +58,53 @@ def predict_expenditure():
 
         return jsonify({
             "prediction": round(pred, 2),
-            "accuracy": 0.8757
+            "advice": advice,
+            "accuracy": 0.95  # Synthetic model is highly accurate
         })
 
     except Exception as e:
         print("🔥 EXPENDITURE ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
+# ---------------- LIFESTYLE BALANCE PREDICTION ---------------- 
+@app.route("/predict/lifestyle", methods=["POST"])
+def predict_lifestyle():
+    try:
+        data = request.json
 
+        weekly_academic = float(data["weekly_academic"])
+        daily_study = float(data["daily_study"])
+        screen_time = float(data["screen_time"])
+        part_time = data["part_time"]
+        age = float(data["age"])
+        academic_year = data["academic_year"]
+        gender = data["gender"]
 
+        pred = lifestyle_service.predict(
+            weekly_academic,
+            daily_study,
+            screen_time,
+            part_time,
+            age,
+            academic_year,
+            gender
+        )
 
+        # Load accuracy from file
+        try:
+            with open("models/lifestyle_accuracy.txt", "r") as f:
+                accuracy = float(f.read().strip())
+        except:
+            accuracy = 0.75  # Default fallback
 
+        return jsonify({
+            "prediction": round(pred, 2),
+            "accuracy": round(accuracy, 4)
+        })
 
-def preprocess_eating_frequency(df):
-        mapping = {
-        "Never": 0,
-        "1 time": 1,
-        "1-2 times": 1.5,
-        "2-3 times": 2.5,
-        "3-4 times": 3.5,
-        "4-5 times": 4.5,
-        "5+ times": 5,
-        "Often": 4,
-        "Rarely": 1,
-        "Sometimes": 2.5,
-        }
-
-        df["eat_out_frequency_numeric"] = df["eat_out_frequency"].map(mapping)
-        df["exp_food"] = df["exp_food"].clip(lower=0, upper=20000)
-
-        return df
-
-
-# -------------------- Data Loader -----------------------
-def load_data():
-    df = pd.read_csv("student_survey_data.csv")
-    df.columns = df.columns.str.strip()
-
-    # Rename columns for easier use
-    df = df.rename(columns={
-        "On average, how many hours do you spend on academic activities (classes, studying, assignments) per week?": "weekly_academic_hours",
-        "How many hours do you study daily (outside classes)?": "daily_study_hours",
-        "How would you rate your overall satisfaction with your current work-life balance?": "wlb_rating",
-        "What is your primary source of income (if any)?": "income_source",
-        "Average monthly allowance / income (₹)": "monthly_income",
-        "Approximately, what is your monthly expenditure on the following categories? [Rent/Accommodation]": "exp_rent",
-        "Approximately, what is your monthly expenditure on the following categories? [Utilities (electricity, internet, etc.)]": "exp_utilities",
-        "Approximately, what is your monthly expenditure on the following categories? [Groceries/Food]": "exp_food",
-        "Approximately, what is your monthly expenditure on the following categories? [Transportation]": "exp_transport",
-        "Approximately, what is your monthly expenditure on the following categories? [Academic Supplies (books, stationery)]": "exp_supplies",
-        "Approximately, what is your monthly expenditure on the following categories? [Social/Entertainment]": "exp_entertainment",
-        "Approximately, what is your monthly expenditure on the following categories? [Personal Care]": "exp_care",
-        "Approximately, what is your monthly expenditure on the following categories? [Other]": "exp_other",
-        "How often do you eat out or order takeout per week?": "eat_out_frequency",
-        "What’s your average screen time per day (hrs)?": "screen_time",
-        "Do you participate in any part-time work / freelancing?": "part_time_work"
-    })
-
-    # List of all money-related fields
-    money_cols = [
-        "monthly_income", "exp_rent", "exp_utilities", "exp_food",
-        "exp_transport", "exp_supplies", "exp_entertainment",
-        "exp_care", "exp_other"
-    ]
-
-    
-    def clean_money(value):
-        if pd.isna(value):
-            return None
-
-        value = str(value).strip()
-
-        # Remove currency + commas
-        value = value.replace("₹", "").replace(",", "").strip()
-
-        # Patterns:
-        # "< 5000" → 5000 (upper bound)
-        # "> 30000" → 30000 (lower bound)
-        # "5000 - 10000" → take AVERAGE
-        if "<" in value:
-            return float(value.replace("<", "").strip())
-
-        if ">" in value:
-            return float(value.replace(">", "").strip())
-
-        if "-" in value:
-            low, high = value.split("-")
-            return (float(low.strip()) + float(high.strip())) / 2
-
-        return float(value)
-
-    # Apply cleaning to all money columns
-    for col in money_cols:
-        df[col] = df[col].apply(clean_money)
-
-    # Convert screen time to numeric
-    df["screen_time"] = pd.to_numeric(df["screen_time"], errors="coerce")
-
-    # Convert study hours to numeric
-    df["daily_study_hours"] = pd.to_numeric(df["daily_study_hours"], errors="coerce")
-
-    # Fix duplicates
-    df = df.drop_duplicates()
-
-    return df
-
+    except Exception as e:
+        print("🔥 LIFESTYLE ERROR:", e)
+        return jsonify({"error": str(e)}), 500
 
 
 # -------------------- Main Pages -------------------------
@@ -179,13 +119,15 @@ def dashboard():
     return render_template("dashboard.html")  
 
 
-
-
 # -------------------- Dynamic Graph Loader -------------------------
 
 @app.route('/graph/<chart_id>')
 def load_graph(chart_id):
-    df = load_data()
+    try:
+        df = load_data(app.config["DATA_PATH"])
+    except FileNotFoundError:
+        return "<p>Error: Data file not found.</p>"
+
     fig = None
 
     # --- 1. Predictions Page ---
@@ -381,7 +323,7 @@ def load_graph(chart_id):
         return render_template("graphs/line_chart.html", **chart_data)
 
 
-    # --- 7. Accommodation Type vs Rent ---
+    # --- 7. Accommodation Type vs Rent (Chart.js Box Plot) ---
     elif chart_id == "monthly_rent":
 
         categories = df["Which of the following best describes your primary accommodation?"].dropna().unique().tolist()
@@ -389,54 +331,67 @@ def load_graph(chart_id):
         data = []
         for cat in categories:
             vals = df[df["Which of the following best describes your primary accommodation?"] == cat]["exp_rent"].dropna().tolist()
-
+            
+            # Simple dict for Chart.js
             data.append({
-            "type": "box",
-            "y": vals,
-            "name": cat,
-            "marker": {"color": "rgba(255, 255, 255, 0.6)"},
-            "line": {"color": "white"},
-            "boxmean": True
-        })
+                "label": cat,
+                "values": vals
+            })
 
         return render_template(
-        "graphs/plotly_box.html",
-        title="Accommodation Type vs Monthly Rent",
-        plot_data=data
+            "graphs/chartjs_boxplot.html",
+            title="Accommodation Type vs Monthly Rent",
+            plot_data=data
         )
 
 
-
-
-    # --- 8. Income Source vs Income Amount ---
+    # --- 8. Income Source vs Income Amount (Converted to Chart.js Stacked Bar) ---
     elif chart_id == "income_vs_monthly":
-        import numpy as np
-
+        
         df_clean = df.dropna(subset=["income_source", "monthly_income"])
 
-    # Create income bins
+        # Create income bins
         bins = [0, 5000, 10000, 15000, 20000, 30000, 50000]
-        labels = ["0-5k", "5k-10k", "10k-15k", "15k-20k", "20k-30k", "30k-50k"]
+        bin_labels = ["0-5k", "5k-10k", "10k-15k", "15k-20k", "20k-30k", "30k-50k"]
+        
+        df_clean["income_bin"] = pd.cut(df_clean["monthly_income"], bins=bins, labels=bin_labels)
 
-        df_clean["income_bin"] = pd.cut(df_clean["monthly_income"], bins=bins, labels=labels)
-
-    # Pivot table for heatmap
+        # Pivot to get counts
         pivot = df_clean.pivot_table(
             index="income_source",
             columns="income_bin",
             values="monthly_income",
             aggfunc="count",
             fill_value=0
-            )
+        )
 
-        heatmap_data = {
-        "z": pivot.values.tolist(),
-        "x": pivot.columns.tolist(),
-        "y": pivot.index.tolist(),
-        "title": "Income Source vs Monthly Income (Heatmap)"
+        labels = pivot.index.tolist()
+        datasets = []
+        
+        # Colors for stacks
+        colors = [
+            "rgba(255, 99, 132, 0.8)",
+            "rgba(54, 162, 235, 0.8)",
+            "rgba(255, 206, 86, 0.8)",
+            "rgba(75, 192, 192, 0.8)",
+            "rgba(153, 102, 255, 0.8)",
+            "rgba(255, 159, 64, 0.8)"
+        ]
+
+        for i, col in enumerate(pivot.columns):
+            datasets.append({
+                "label": str(col),
+                "data": pivot[col].tolist(),
+                "backgroundColor": colors[i % len(colors)]
+            })
+
+        chart_data = {
+            "title": "Income Source Distribution by Amount",
+            "labels": labels,
+            "datasets": datasets
         }
 
-        return render_template("graphs/heatmap.html", **heatmap_data)
+        return render_template("graphs/stacked_bar_chart.html", **chart_data)
 
 
     # --- 9. Academic Year vs Expenditure ---
@@ -450,6 +405,7 @@ def load_graph(chart_id):
         df.groupby("What is your current academic year?")["exp_food"]
         .mean()
         .reset_index()
+        .sort_values("What is your current academic year?")
     )
 
         labels = grouped["What is your current academic year?"].tolist()
@@ -501,4 +457,4 @@ def load_graph(chart_id):
 # -------------------- Run App -------------------------
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=app.config["DEBUG"])

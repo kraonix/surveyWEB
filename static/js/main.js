@@ -112,21 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 <label>Monthly Income (₹)</label>
                 <input id="inc_val" type="number" placeholder="e.g. 15000">
 
-                <label>Gender</label>
-                <select id="gender">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-
-                <label>Work-Life Balance Rating</label>
-                <input id="wlb_val" type="number" min="1" max="5" placeholder="1–5">
-
-                <label>Daily Study Hours</label>
-                <input id="daily_study" type="number">
-
-                <label>Screen Time (hrs)</label>
-                <input id="screen_time" type="number">
-
                 <label>Eat Out Frequency</label>
                 <select id="eat_freq">
                     <option value="Never">Never</option>
@@ -166,6 +151,53 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button class="submit-btn" onclick="predictExpenditure()">Predict</button>
 
                 <div id="exp-prediction-box" class="prediction-output"></div>
+            </div>
+            `;
+        }
+
+        /* ---------------- LIFESTYLE BALANCE MODEL ---------------- */
+        if (type === "lifestyle") {
+            ui = `
+            <div class="viz-tile">
+                ${back}
+                <h2>Lifestyle Balance Predictor</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Predict your work-life balance rating (1-5 scale) based on your lifestyle factors</p>
+
+                <label>Age</label>
+                <input id="lifestyle_age" type="number" placeholder="Enter age">
+
+                <label>Gender</label>
+                <select id="lifestyle_gender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+
+                <label>Academic Year</label>
+                <select id="lifestyle_academic_year">
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                </select>
+
+                <label>Weekly Academic Hours</label>
+                <input id="weekly_academic" type="number" placeholder="Hours per week" step="0.5">
+
+                <label>Daily Study Hours (outside classes)</label>
+                <input id="daily_study_lifestyle" type="number" placeholder="Hours per day" step="0.5">
+
+                <label>Screen Time (hours per day)</label>
+                <input id="screen_time_lifestyle" type="number" placeholder="Hours per day" step="0.5">
+
+                <label>Part-Time Work</label>
+                <select id="part_time_lifestyle">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+
+                <button class="submit-btn" onclick="predictLifestyle()">Predict Balance</button>
+
+                <div id="lifestyle-prediction-box" class="prediction-output"></div>
             </div>
             `;
         }
@@ -224,10 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const payload = {
             income: Number(document.getElementById("inc_val").value),
-            gender: document.getElementById("gender").value,
-            wlb_rating: Number(document.getElementById("wlb_val").value),
-            daily_study: Number(document.getElementById("daily_study").value),
-            screen_time: Number(document.getElementById("screen_time").value),
             eat_out_frequency: document.getElementById("eat_freq").value,
             academic_year: document.getElementById("acad_year").value,
             accommodation: document.getElementById("accommodation").value,
@@ -247,14 +275,129 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
 
+        let adviceColor = data.advice === "Spend less" ? "#ff6b6b" : "#00c89b";
+
         document.getElementById("exp-prediction-box").innerHTML = `
             <div class="prediction-card">
                 <h3>Estimated Monthly Expenditure</h3>
                 <p class="pred-value">₹${Math.round(data.prediction)}</p>
+                <p style="color: ${adviceColor}; font-weight: bold; font-size: 1.2rem; margin-top: 10px;">${data.advice}</p>
                 <h4>Model Accuracy</h4>
                 <p class="acc-value">${(data.accuracy * 100).toFixed(2)}%</p>
             </div>
         `;
+    };
+
+
+    /* ---------------- LIFESTYLE BALANCE PREDICTION ---------------- */
+    window.predictLifestyle = async function () {
+        const weekly_academic = Number(document.getElementById("weekly_academic").value);
+        const daily_study = Number(document.getElementById("daily_study_lifestyle").value);
+        const screen_time = Number(document.getElementById("screen_time_lifestyle").value);
+        const part_time = document.getElementById("part_time_lifestyle").value;
+        const age = Number(document.getElementById("lifestyle_age").value);
+        const academic_year = document.getElementById("lifestyle_academic_year").value;
+        const gender = document.getElementById("lifestyle_gender").value;
+
+        // Validate inputs
+        if (!weekly_academic || !daily_study || !screen_time || !age) {
+            const toast = document.getElementById("toast");
+            if (toast) {
+                toast.textContent = "⚠️ Please fill all fields.";
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 3000);
+            } else {
+                alert("⚠️ Please fill all fields.");
+            }
+            return;
+        }
+
+        const payload = {
+            weekly_academic,
+            daily_study,
+            screen_time,
+            part_time,
+            age,
+            academic_year,
+            gender
+        };
+
+        // Show loading state
+        const predictionBox = document.getElementById("lifestyle-prediction-box");
+        predictionBox.innerHTML = '<div class="prediction-card"><p>Predicting...</p></div>';
+
+        try {
+            const res = await fetch("/predict/lifestyle", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
+            const data = await res.json();
+
+            if (data.error) {
+                const toast = document.getElementById("toast");
+                if (toast) {
+                    toast.textContent = "⚠️ " + data.error;
+                    toast.classList.add("show");
+                    setTimeout(() => toast.classList.remove("show"), 3000);
+                } else {
+                    alert("⚠️ " + data.error);
+                }
+                predictionBox.innerHTML = "";
+                return;
+            }
+
+            if (!data.prediction && data.prediction !== 0) {
+                throw new Error("No prediction returned from server");
+            }
+
+            const rating = parseFloat(data.prediction);
+            let ratingText = "";
+            let ratingColor = "";
+
+            if (rating >= 4.5) {
+                ratingText = "Excellent";
+                ratingColor = "#00c89b";
+            } else if (rating >= 3.5) {
+                ratingText = "Good";
+                ratingColor = "#82ced0";
+            } else if (rating >= 2.5) {
+                ratingText = "Moderate";
+                ratingColor = "#93d6d5";
+            } else if (rating >= 1.5) {
+                ratingText = "Poor";
+                ratingColor = "#a3ddda";
+            } else {
+                ratingText = "Very Poor";
+                ratingColor = "#b3e5e0";
+            }
+
+            predictionBox.innerHTML = `
+                <div class="prediction-card">
+                    <h3>Predicted Work-Life Balance</h3>
+                    <p class="pred-value" style="color: ${ratingColor};">${rating.toFixed(2)} / 5.0</p>
+                    <p style="margin-top: 10px; font-size: 1.1rem; color: ${ratingColor};">${ratingText}</p>
+                    <h4>Model Accuracy</h4>
+                    <p class="acc-value">${((data.accuracy || 0.7058) * 100).toFixed(2)}%</p>
+                </div>
+            `;
+        } catch (error) {
+            console.error("Lifestyle prediction error:", error);
+            const toast = document.getElementById("toast");
+            if (toast) {
+                toast.textContent = "⚠️ Error making prediction: " + error.message;
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 3000);
+            } else {
+                alert("⚠️ Error making prediction. Please try again.\n" + error.message);
+            }
+            predictionBox.innerHTML = '<div class="prediction-card"><p style="color: #a3ddda;">Error: Could not get prediction. Please check console for details.</p></div>';
+        }
     };
 
 });
